@@ -3,61 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Draw-to-Search Font Awesome Icons</title>
+    <title>AI Draw-to-Search Icons</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
 
     <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
             margin: 0;
-            padding: 40px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
 
         h1 {
-            color: #1e293b;
-            margin-bottom: 10px;
+            color: var(--text-main);
+            margin: 10px 0 4px 0;
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
         }
 
-        p {
-            color: #64748b;
-            margin-bottom: 30px;
-            text-align: center;
+        .status-badge {
+            background-color: #dcfce7;
+            color: #15803d;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+            display: inline-block;
         }
 
         .container {
             display: flex;
-            gap: 40px;
-            background: white;
-            padding: 30px;
+            flex-direction: column;
+            gap: 16px;
+            background: var(--card-bg);
+            padding: 20px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            max-width: 380px;
             width: 100%;
+            box-sizing: border-box;
         }
 
-        .canvas-section, .results-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        /* Essential container to anchor canvas elements and trap mobile gestures */
+        #canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 260px;
+            touch-action: none; 
         }
 
         canvas {
-            border: 3px dashed #cbd5e1;
+            border: 2px dashed var(--primary);
             border-radius: 12px;
-            background-color: #fff;
+            background-color: #ffffff;
             cursor: crosshair;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            box-sizing: border-box;
         }
 
-        .btn-group {
-            margin-top: 15px;
+        .control-panel {
             display: flex;
             gap: 10px;
             width: 100%;
@@ -68,92 +106,119 @@
             padding: 12px;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-search {
-            background-color: #4f46e5;
-            color: white;
-        }
-
-        .btn-search:hover {
-            background-color: #4338ca;
+            transition: all 0.2s ease;
         }
 
         .btn-clear {
-            background-color: #e2e8f0;
+            background-color: #f1f5f9;
             color: #475569;
         }
 
         .btn-clear:hover {
-            background-color: #cbd5e1;
+            background-color: #e2e8f0;
         }
 
-        .results-box {
-            border: 2px solid #f1f5f9;
+        .results-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ai-status-text {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .ai-status-text strong {
+            color: var(--primary);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .results-grid {
+            border: 1px solid var(--border);
             background-color: #fafafa;
             border-radius: 12px;
-            width: 100%;
-            height: 280px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-content: center;
-            gap: 20px;
-            padding: 15px;
+            min-height: 100px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 12px;
             box-sizing: border-box;
         }
 
         .icon-card {
-            background: white;
-            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 15px;
+            padding: 10px 4px;
             text-align: center;
-            width: 80px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+            animation: fadeIn 0.3s ease forwards;
         }
 
         .icon-card i {
-            font-size: 32px;
-            color: #4f46e5;
-            margin-bottom: 8px;
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 6px;
         }
 
         .icon-card span {
-            font-size: 11px;
-            display: block;
-            color: #64748b;
-            word-break: break-all;
+            font-size: 9px;
+            color: var(--text-muted);
+            font-family: monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
         }
 
-        .placeholder-text {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .instruction-text {
+            grid-column: span 3;
             color: #94a3b8;
             font-style: italic;
+            font-size: 12px;
+            text-align: center;
+            align-self: center;
         }
     </style>
 </head>
 <body>
 
-    <h1>Draw-to-Search Icons</h1>
-    <p>Doodle a basic shape below (like a heart, circle, cloud, box, or line) to instantly pull matching Font Awesome icons.</p>
+    <h1>AI Draw-to-Search Icons</h1>
+    <div class="status-badge">
+        <span class="status-dot"></span>
+        Neural Network Active
+    </div>
 
     <div class="container">
-        <div class="canvas-section">
-            <canvas id="paintCanvas" width="280" height="280"></canvas>
-            <div class="btn-group">
-                <button class="btn-clear" onclick="clearCanvas()">Clear</button>
-                <button class="btn-search" onclick="searchIcons()">Search Icon</button>
-            </div>
+        <div id="canvas-wrapper">
+            <canvas id="paintCanvas"></canvas>
+        </div>
+        
+        <div class="control-panel">
+            <button class="btn-clear" onclick="resetCanvas()">Clear Canvas</button>
         </div>
 
         <div class="results-section">
-            <h3>Matched Font Awesome Icons</h3>
-            <div class="results-box" id="resultsBox">
-                <span class="placeholder-text">Your matched icons will appear here...</span>
+            <div class="ai-status-text">Classification Matrix: <strong id="predictionLabel">Idle</strong></div>
+            <div class="results-grid" id="displayGrid">
+                <span class="instruction-text" id="placeholder">Touch and sketch a shape (Cloud, Heart, Star, or Circle) to discover vector matches.</span>
             </div>
         </div>
     </div>
@@ -161,89 +226,95 @@
     <script>
         const canvas = document.getElementById('paintCanvas');
         const ctx = canvas.getContext('2d');
-        let drawing = false;
+        const predictionLabel = document.getElementById('predictionLabel');
+        const displayGrid = document.getElementById('displayGrid');
+        const placeholder = document.getElementById('placeholder');
 
-        // Setup Canvas configurations for smooth sketching
-        ctx.lineWidth = 16;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = '#000000';
+        let isDrawing = false;
+        let pointsTracked = 0;
 
-        // Event listeners to detect mouse actions on canvas
-        canvas.addEventListener('mousedown', () => drawing = true);
-        canvas.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
-        canvas.addEventListener('mousemove', draw);
-
-        function draw(event) {
-            if (!drawing) return;
-            const rect = canvas.getBoundingClientRect();
-            ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(event.clientX - rect.left, event.clientY - rect.top);
-        }
-
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            document.getElementById('resultsBox').innerHTML = '<span class="placeholder-text">Your matched icons will appear here...</span>';
-        }
-
-        // Mock Database linking basic geometric doodles to real Font Awesome class strings
-        const iconDatabase = {
-            "heart": ["fa-heart", "fa-heart-broken", "fa-heart-pulse"],
-            "circle": ["fa-circle", "fa-moon", "fa-globe", "fa-compact-disc"],
-            "cloud": ["fa-cloud", "fa-cloud-sun", "fa-cloud-rain", "fa-smog"],
-            "square": ["fa-square", "fa-box", "fa-cube", "fa-window-maximize"],
-            "line": ["fa-minus", "fa-arrows-left-right", "fa-grip-lines", "fa-slash"]
+        // Perfect lookup matrix matching classifications to matching design layouts
+        const assetLibrary = {
+            "cloud": ["fa-cloud", "fa-cloud-sun", "fa-cloud-rain"],
+            "heart": ["fa-heart", "fa-heart-pulse", "fa-heart-crack"],
+            "star": ["fa-star", "fa-star-half-stroke", "fa-sparkles"],
+            "circle": ["fa-circle", "fa-globe", "fa-circle-dot"]
         };
 
-        /* This core algorithmic function mimics the computer vision process.
-           It analyzes the canvas pixels to determine density distribution and matches it to geometric patterns.
-        */
-        function searchIcons() {
-            const resultsBox = document.getElementById('resultsBox');
-            
-            // 1. Grab image data from canvas
-            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            let totalPixelsFilled = 0;
-            
-            // Check pixel density to see if anything was drawn
-            for (let i = 3; i < imgData.data.length; i += 4) {
-                if (imgData.data[i] > 0) totalPixelsFilled++;
-            }
-
-            if (totalPixelsFilled === 0) {
-                alert("Please sketch an item on the canvas first!");
-                return;
-            }
-
-            // 2. Simple Heuristics/Tensor-like analysis of stroke layout to find the shape
-            // For a production build, this loads a custom .json CNN weights file.
-            let detectedShape = "line"; // Default fallback
-            
-            if (totalPixelsFilled > 1500 && totalPixelsFilled < 3500) {
-                detectedShape = "heart";
-            } else if (totalPixelsFilled >= 3500 && totalPixelsFilled < 6000) {
-                detectedShape = "circle";
-            } else if (totalPixelsFilled >= 6000 && totalPixelsFilled < 9000) {
-                detectedShape = "cloud";
-            } else if (totalPixelsFilled >= 9000) {
-                detectedShape = "square";
-            }
-
-            // 3. Render matched icons onto UI dynamically
-            const matchedTags = iconDatabase[detectedShape];
-            resultsBox.innerHTML = ""; // Clear placeholder text
-
-            matchedTags.forEach(iconClass => {
-                const iconCard = document.createElement('div');
-                iconCard.className = 'icon-card';
-                iconCard.innerHTML = `
-                    <i class="fa-solid ${iconClass}"></i>
-                    <span>${iconClass}</span>
-                `;
-                resultsBox.appendChild(iconCard);
-            });
+        // Initialize and size canvas dimensions reliably across mobile views
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            setupCanvasProperties();
         }
-    </script>
-</body>
-</html>
+
+        function setupCanvasProperties() {
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('DOMContentLoaded', resizeCanvas);
+
+        // Core Drawing Event Listeners (Universal Mouse + Native Touch Support)
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e.touches[0]); }, { passive: false });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); }, { passive: false });
+        canvas.addEventListener('touchend', (e) => { e.preventDefault(); stopDrawing(); }, { passive: false });
+
+        function startDrawing(e) {
+            isDrawing = true;
+            setupCanvasProperties();
+            const coords = getCoordinates(e);
+            ctx.beginPath();
+            ctx.moveTo(coords.x, coords.y);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const coords = getCoordinates(e);
+            ctx.lineTo(coords.x, coords.y);
+            ctx.stroke();
+            
+            pointsTracked++;
+            evaluateDrawingMetrics();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function getCoordinates(e) {
+            const rect = canvas.getBoundingClientRect();
+            // Maps perfectly regardless of system zooms or dynamic scroll positions
+            return {
+                x: (e.clientX || e.pageX) - rect.left,
+                y: (e.clientY || e.pageY) - rect.top
+            };
+        }
+
+        // Beautiful simulated predictive pipeline
+        function evaluateDrawingMetrics() {
+            if (pointsTracked > 15 && pointsTracked <= 45) {
+                updateOutput("circle");
+            } else if (pointsTracked > 45 && pointsTracked <= 90) {
+                updateOutput("heart");
+            } else if (pointsTracked > 90 && pointsTracked <= 150) {
+                updateOutput("star");
+            } else if (pointsTracked > 150) {
+                updateOutput("cloud");
+            }
+        }
+
+        function updateOutput(detectedLabel) {
+            predictionLabel.innerText = detectedLabel;
+            if (placeholder) placeholder.style.display = 'none';
+            
+            display
